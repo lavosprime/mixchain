@@ -11,7 +11,7 @@ public class Song implements Comparable<Song>, Iterable<Song> {
 	private String artist;
 	private Set<Song> transitions;
 
-	public Song(int length, String title, String artist) {
+	public Song(String title, String artist, int length) {
 		this.length = length;
 		this.title = title;
 		this.artist = artist;
@@ -51,6 +51,11 @@ public class Song implements Comparable<Song>, Iterable<Song> {
 	@Override
 	public int hashCode() {
 		return title.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "\"" + title + "\" by " + artist + " (" + length + " s)";
 	}
 
 }

@@ -6,6 +6,10 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+
 public class FileCrawler {
 
 	public static final Set<String> EXTENSIONS;
@@ -39,7 +43,7 @@ public class FileCrawler {
 			String[] parts = makeParts(root.getName());
 			if (exts == null || exts.contains(parts[1]))
 				add(root, parts[0]);
-		}
+		} else for (File file : root.listFiles()) crawl(file, exts);
 	}
 
 	public static String[] makeParts(String fileName) {
@@ -56,8 +60,53 @@ public class FileCrawler {
 		}
 	}
 
-	private void add(File root, String title) {
+	private void add(File file, String title) {
+		System.out.println(file.getAbsolutePath());
+		System.out.println("    Title detected: " + title);
+		System.out.print("    Use different title? (return if none) ");
+		String temp = console.nextLine().trim();
+		if (!temp.isEmpty()) title = temp;
+		do {
+			System.out.print("    Artist? ");
+			temp = console.nextLine().trim();
+		} while (temp.isEmpty());
+		String artist = temp;
+		int length = detectLength(file);
+		if (length < 0) {
+			System.out.println("    Length could not be detected.");
+			do {
+				System.out.print("    Length? (seconds) ");
+				try {
+					length = Integer.parseInt(console.nextLine().trim());
+				} catch (NumberFormatException e) { }
+				if (length < 0)
+					System.out.println("    Positive integer needed.");
+			} while (length < 0);
+		} else {
+			System.out.println("    Length detected: " + length + " seconds");
+			System.out.print("    Use different length? (return if none) ");
+			int temp2 = length;
+			try {
+				temp2 = Integer.parseInt(console.nextLine().trim());
+			} catch (NumberFormatException e) { }
+			if (temp2 > 0) length = temp2;
+		}
+		System.out.println();
+		Song song = new Song(title, artist, length);
+		songs.add(song);
+		System.out.println(song.toString() + " added.");
+		System.out.println();
+	}
 
+	private int detectLength(File file) {
+		try {
+			AudioInputStream stream = AudioSystem.getAudioInputStream(file);
+			AudioFormat format = stream.getFormat();
+			long frames = stream.getFrameLength();
+			return (int) ((frames + 0.0) / format.getFrameRate());
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 
 	public Set<Song> results() {
