@@ -43,13 +43,17 @@ public class FileCrawler {
 	}
 
 	public static String[] makeParts(String fileName) {
-		String[] raw = fileName.split(".");
-		String[] parts = new String[2];
-		parts[0] = raw[0];
-		parts[1] = raw[raw.length - 1].toLowerCase();
-		for (int i = 1; i < raw.length - 1; i++)
-			parts[0] += "." + raw[i];
-		return parts;
+		String[] raw = fileName.split("[.]");
+		if (raw.length == 0)
+			return new String[] {"", ""};
+		else {
+			String[] parts = new String[2];
+			parts[0] = raw[0];
+			parts[1] = raw[raw.length - 1].toLowerCase();
+			for (int i = 1; i < raw.length - 1; i++)
+				parts[0] += "." + raw[i];
+			return parts;
+		}
 	}
 
 	private void add(File root, String title) {
